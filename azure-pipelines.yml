@@ -45,5 +45,6 @@ steps:
     condition: always()
     displayName: Publish test results
     inputs:
+      testRunTitle: Test results for $(System.JobName)
       testResultsFormat: VSTest
       testResultsFiles: output/*.trx
