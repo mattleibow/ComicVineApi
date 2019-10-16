@@ -1,0 +1,42 @@
+
+trigger:
+  - master
+
+variables:
+  VERBOSITY: normal
+  DOTNET_CORE_VERSION: 3.0.x
+
+strategy:
+  matrix:
+    macos:
+      imageName: Hosted macOS
+      MONO_VERSION: 6_4_0
+    windows:
+      imageName: Hosted Windows 2019 with VS2019
+    linux:
+      imageName: Hosted Ubuntu 1604
+
+pool:
+  name: $(imageName)
+
+steps:
+  - bash: sudo $AGENT_HOMEDIRECTORY/scripts/select-xamarin-sdk.sh $(MONO_VERSION)
+    displayName: 'Switch to the latest Xamarin SDK'
+    condition: eq(variables['System.JobName'], 'macos')
+
+  - task: UseDotNet@2
+    displayName: 'Use the correct version of the .NET Core SDK'
+    inputs:
+      version: $(DOTNET_CORE_VERSION)
+
+  - powershell: dotnet pack --verbosity=$(VERBOSITY) --output=output --configuration=Release
+    displayName: 'Run build'
+
+  - powershell: dotnet test --verbosity=$(VERBOSITY)  --configuration=Release
+    displayName: 'Run tests'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish artifacts'
+    inputs:
+      pathToPublish: output
+      artifactName: output-$(System.JobName)
