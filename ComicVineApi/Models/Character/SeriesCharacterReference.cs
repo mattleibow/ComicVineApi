@@ -1,9 +1,8 @@
-using System;
 using Newtonsoft.Json;
 
 namespace ComicVineApi.Models
 {
-    public class CharacterReference : Reference
+    public class SeriesCharacterReference : CharacterReference
     {
         [JsonProperty("count")]
         public long Count { get; set; }

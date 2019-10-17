@@ -1,5 +1,6 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using ComicVineApi.Http;
 using ComicVineApi.Models;
 
 namespace ComicVineApi.Clients
@@ -11,13 +12,13 @@ namespace ComicVineApi.Clients
         {
         }
 
-        public Task<IReadOnlyList<Series>> FilterAsync(int page = DefaultPageNumber, int count = DefaultPageSize) =>
-            FilterAsync(new FilterOptions { PageNumber = page, PageSize = count });
+        public Filter<Series, ISeriesSortable, ISeriesFilterable> Filter() =>
+            new Filter<Series, ISeriesSortable, ISeriesFilterable>(this);
 
         public Task<IReadOnlyList<Series>> FilterAsync(FilterOptions options) =>
             FilterAsync<Series>(options);
 
-        public Task<SeriesDetailed> GetAsync(int id) =>
+        public Task<SeriesDetailed> GetAsync(long id) =>
             GetAsync<SeriesDetailed>(id);
     }
 }

@@ -1,17 +1,15 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ComicVineApi.Http;
 
 namespace ComicVineApi.Clients
 {
     public abstract class ClientBase
     {
-        protected const int DefaultPageNumber = 0;
-        protected const int DefaultPageSize = 100;
-
-        private int endpointId;
-        private string filterResource;
-        private string getResource;
+        private readonly int endpointId;
+        private readonly string filterResource;
+        private readonly string getResource;
 
         protected ClientBase(IApiConnection connection, int endpointId, string filterResource, string getResource)
         {
@@ -24,18 +22,30 @@ namespace ComicVineApi.Clients
 
         protected IApiConnection ApiConnection { get; }
 
-        public async Task<IReadOnlyList<T>> FilterAsync<T>(FilterOptions options)
+        protected internal async Task<long> CountAsync<T>()
         {
+            var options = new FilterOptions();
+            options.FieldList.Add("id");
+            options.Limit = 1;
+            options.Offset = 0;
+
             var uri = new Uri(filterResource, UriKind.Relative);
-            var result = await ApiConnection.FilterAsync<T>(uri, options);
-            return result;
+            var result = await ApiConnection.FilterAsync<T>(uri, options).ConfigureAwait(false);
+            return result.NumberOfTotalResults;
         }
 
-        public async Task<T> GetAsync<T>(int id)
+        protected internal async Task<IReadOnlyList<T>> FilterAsync<T>(FilterOptions? options)
         {
-            Uri uri = new Uri($"{getResource}/{endpointId}-{id}", UriKind.Relative);
-            var result = await ApiConnection.GetAsync<T>(uri);
-            return result;
+            var uri = new Uri(filterResource, UriKind.Relative);
+            var result = await ApiConnection.FilterAsync<T>(uri, options).ConfigureAwait(false);
+            return result.Results;
+        }
+
+        protected internal async Task<T> GetAsync<T>(long id)
+        {
+            var uri = new Uri($"{getResource}/{endpointId}-{id}", UriKind.Relative);
+            var result = await ApiConnection.GetAsync<T>(uri).ConfigureAwait(false);
+            return result.Results;
         }
     }
 }

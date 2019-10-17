@@ -1,24 +1,28 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using ComicVineApi.Models;
 using Xunit;
 
 namespace ComicVineApi.Tests.Integration
 {
     public class SeriesClientTests
     {
-        public class TheFilterAsyncMethod
+        public class TheFilterMethod
         {
             [Fact]
             public async Task ReturnsCorrectData()
             {
                 // arrange
-                var client = new ComicVineClient(Configuration.ApiKey);
-                client.ThrowExceptionOnMissingField = true;
+                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
+                client.ThrowExceptionOnMissingFields = true;
 
                 // act
-                var characters = await client.Series.FilterAsync();
+                var results = await client.Series.Filter()
+                    .Take(3)
+                    .ToListAsync();
 
                 // assert
-                Assert.Equal(10, characters.Count);
+                Assert.Equal(3, results.Count);
             }
         }
 
@@ -30,14 +34,39 @@ namespace ComicVineApi.Tests.Integration
             public async Task ReturnsCorrectData(int id, string name)
             {
                 // arrange
-                var client = new ComicVineClient(Configuration.ApiKey);
-                client.ThrowExceptionOnMissingField = true;
+                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
+                client.ThrowExceptionOnMissingFields = true;
 
                 // act
-                var character = await client.Series.GetAsync(id);
+                var result = await client.Series.GetAsync(id);
 
                 // assert
-                Assert.Equal(name, character.Name);
+                Assert.Equal(name, result.Name);
+            }
+        }
+
+        public class RemoteDataSanitation
+        {
+            [Fact]
+            public async Task ReturnsCorrectData()
+            {
+                // arrange
+                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
+                client.ThrowExceptionOnMissingFields = true;
+                var detailed = new List<SeriesDetailed>();
+
+                // act
+                var results = await client.Series.Filter()
+                    .Take(3)
+                    .ToListAsync();
+                foreach (var result in results)
+                {
+                    var res = await client.Series.GetAsync(result.Id);
+                    detailed.Add(res);
+                }
+
+                // assert
+                Assert.Equal(3, detailed.Count);
             }
         }
     }

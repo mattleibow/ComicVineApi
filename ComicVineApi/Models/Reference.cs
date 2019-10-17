@@ -15,6 +15,6 @@ namespace ComicVineApi.Models
         public string Name { get; set; }
 
         [JsonProperty("site_detail_url")]
-        public Uri SiteDetailUrl { get; set; }
+        public Uri? SiteDetailUrl { get; set; }
     }
 }

@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ComicVineApi.Clients;
+using ComicVineApi.Http;
 using ComicVineApi.Models;
 using NSubstitute;
 using Xunit;
@@ -29,9 +29,11 @@ namespace ComicVineApi.Tests.Clients
             {
                 // arrange
                 var uri = new Uri("anything", UriKind.Relative);
-                IReadOnlyList<object> result = new object[0];
+                var result = new CollectionResult<object> { Results = Array.Empty<object>() };
                 var httpConnection = Substitute.For<IHttpConnection>();
-                httpConnection.FilterAsync<object>(Arg.Any<Uri>(), null).Returns(Task.FromResult(result));
+                httpConnection
+                    .FilterAsync<object>(Arg.Any<Uri>(), Arg.Any<Dictionary<string, object>>())
+                    .Returns(Task.FromResult(result));
                 var apiConnection = new ApiConnection(httpConnection);
 
                 // act
@@ -41,7 +43,7 @@ namespace ComicVineApi.Tests.Clients
                 Assert.Same(result, characters);
                 _ = httpConnection.Received().FilterAsync<object>(
                     Arg.Is<Uri>(u => u.ToString() == "anything"),
-                    Arg.Is<Dictionary<string, object>>(o => o == null));
+                    Arg.Any<Dictionary<string, object>>());
             }
         }
     }

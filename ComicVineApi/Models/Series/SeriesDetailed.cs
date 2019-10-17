@@ -5,7 +5,7 @@ namespace ComicVineApi.Models
     public class SeriesDetailed : Series
     {
         [JsonProperty("characters")]
-        public CharacterReference[] Characters { get; set; }
+        public SeriesCharacterReference[] Characters { get; set; }
 
         [JsonProperty("episodes")]
         public EpisodeReference[] Episodes { get; set; }

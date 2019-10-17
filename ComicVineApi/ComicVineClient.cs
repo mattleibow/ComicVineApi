@@ -1,4 +1,5 @@
-using ComicVineApi.Clients;
+﻿using ComicVineApi.Clients;
+using ComicVineApi.Http;
 
 namespace ComicVineApi
 {
@@ -6,9 +7,9 @@ namespace ComicVineApi
     {
         private readonly IHttpConnection connection;
 
-        public ComicVineClient(string apiKey)
+        public ComicVineClient(string apiKey, string? userAgent = null)
         {
-            connection = new HttpConnection(apiKey);
+            connection = new HttpConnection(apiKey, userAgent);
 
             var apiConnection = new ApiConnection(connection);
             Character = new CharacterClient(apiConnection);
@@ -22,10 +23,10 @@ namespace ComicVineApi
 
         public IssueClient Issue { get; }
 
-        public bool ThrowExceptionOnMissingField
+        internal bool ThrowExceptionOnMissingFields
         {
-            get => connection.ThrowExceptionOnMissingField;
-            set => connection.ThrowExceptionOnMissingField = value;
+            get => connection.ThrowExceptionOnMissingFields;
+            set => connection.ThrowExceptionOnMissingFields = value;
         }
     }
 }

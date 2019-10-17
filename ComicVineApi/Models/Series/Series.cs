@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace ComicVineApi.Models
 {
-    public class Series
+    public class Series : ISeriesSortable, ISeriesFilterable
     {
         [JsonProperty("aliases")]
         [JsonConverter(typeof(NewlineDelimitedArrayConverter))]
@@ -44,7 +44,7 @@ namespace ComicVineApi.Models
         public string Name { get; set; }
 
         [JsonProperty("publisher")]
-        public Reference Publisher { get; set; }
+        public PublisherReference Publisher { get; set; }
 
         [JsonProperty("site_detail_url")]
         public Uri SiteDetailUrl { get; set; }
