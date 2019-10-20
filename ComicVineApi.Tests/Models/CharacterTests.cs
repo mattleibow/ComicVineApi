@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Xunit;
 
-namespace ComicVineApi.Tests.Clients
+namespace ComicVineApi.Tests.Models
 {
     public class CharacterTests
     {

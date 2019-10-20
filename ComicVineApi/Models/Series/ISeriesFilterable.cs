@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 
 namespace ComicVineApi.Models
 {
     public interface ISeriesFilterable
     {
-        DateTimeOffset DateAdded { get; set; }
+        DateTimeOffset? DateAdded { get; set; }
 
-        DateTimeOffset DateLastUpdated { get; set; }
+        DateTimeOffset? DateLastUpdated { get; set; }
 
-        long Id { get; set; }
+        int? Id { get; set; }
 
-        string Name { get; set; }
+        string? Name { get; set; }
     }
 }

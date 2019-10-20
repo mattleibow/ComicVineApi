@@ -1,44 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using ComicVineApi.Models;
 using Newtonsoft.Json;
 
 namespace ComicVineApi.Http
 {
-    public class HttpConnection : IHttpConnection, IDisposable
+    public class HttpConnection : IHttpConnection
     {
         private static readonly Uri DefaultHost = new Uri("https://comicvine.com/api/");
 
-        private readonly HttpClient httpClient;
+        private readonly IHttpMessenger httpClient;
 
-        public HttpConnection(string apiKey, string? userAgent = null)
+        public HttpConnection(IHttpMessenger messenger, string apiKey)
         {
-            httpClient = new HttpClient();
-
-            if (!string.IsNullOrWhiteSpace(userAgent))
-                httpClient.DefaultRequestHeaders.Add("User-Agent", userAgent);
-
-            UserAgent = userAgent;
+            httpClient = messenger;
             ApiKey = apiKey;
         }
 
-        public string? UserAgent { get; }
-
         public string ApiKey { get; }
 
-        public bool ThrowExceptionOnMissingFields { get; set; }
+        public bool ThrowOnMissingProperties { get; set; }
 
         public async Task<CollectionResult<T>> FilterAsync<T>(Uri uri, Dictionary<string, object>? options)
         {
             uri = GenerateUri(uri, options);
 
-            var json = await httpClient.GetStringAsync(uri).ConfigureAwait(false);
+            var json = await httpClient.GetAsync(uri).ConfigureAwait(false);
 
             var settings = GetSerializerSettings();
             var collection = JsonConvert.DeserializeObject<CollectionResult<T>>(json, settings);
+
+            collection.EnsureSuccessStatusCode();
 
             return collection;
         }
@@ -47,19 +41,35 @@ namespace ComicVineApi.Http
         {
             uri = GenerateUri(uri);
 
-            var json = await httpClient.GetStringAsync(uri).ConfigureAwait(false);
+            var json = await httpClient.GetAsync(uri).ConfigureAwait(false);
 
             var settings = GetSerializerSettings();
             var single = JsonConvert.DeserializeObject<SingleResult<T>>(json, settings);
 
+            single.EnsureSuccessStatusCode();
+
             return single;
+        }
+
+        public async Task<SearchResult> SearchAsync(Uri uri, Dictionary<string, object>? options)
+        {
+            uri = GenerateUri(uri);
+
+            var json = await httpClient.GetAsync(uri).ConfigureAwait(false);
+
+            var settings = GetSerializerSettings();
+            var search = JsonConvert.DeserializeObject<SearchResult>(json, settings);
+
+            search.EnsureSuccessStatusCode();
+
+            return search;
         }
 
         private JsonSerializerSettings GetSerializerSettings()
         {
             return new JsonSerializerSettings
             {
-                MissingMemberHandling = ThrowExceptionOnMissingFields
+                MissingMemberHandling = ThrowOnMissingProperties
                     ? MissingMemberHandling.Error
                     : MissingMemberHandling.Ignore
             };
@@ -79,18 +89,6 @@ namespace ComicVineApi.Http
             };
 
             return builder.Uri;
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-                httpClient.Dispose();
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

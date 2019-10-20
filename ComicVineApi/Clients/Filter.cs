@@ -12,7 +12,6 @@ namespace ComicVineApi.Clients
         where TModel : TSortable, TFilterable
     {
         private readonly ClientBase client;
-
         private readonly FilterOptions options;
 
         internal Filter(ClientBase client, FilterOptions? options = null)
@@ -23,14 +22,7 @@ namespace ComicVineApi.Clients
 
         public Filter<TModel, TSortable, TFilterable> IncludeField<TValue>(Expression<Func<TModel, TValue>> property)
         {
-            _ = property ?? throw new ArgumentNullException(nameof(property));
-
-            var mx = property.Body as MemberExpression;
-            var propertyInfo = mx?.Member as PropertyInfo
-                ?? throw new ArgumentException($"The lambda expression '{nameof(property)}' should point to a valid Property.");
-
-            var jsonProperty = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
-            var jsonName = jsonProperty.PropertyName;
+            var jsonName = GetPropertyName(property);
 
             var clone = Clone();
             clone.options.FieldList.Add(jsonName);
@@ -38,17 +30,49 @@ namespace ComicVineApi.Clients
             return clone;
         }
 
-        // public Filter<TModel, TSortable, TFilterable> OrderBy<TValue>(Expression<Func<TSortable, TValue>> property)
-        // {
-        // }
+        public Filter<TModel, TSortable, TFilterable> OrderBy<TValue>(Expression<Func<TSortable, TValue>> property)
+        {
+            var jsonName = GetPropertyName(property);
 
-        // public Filter<TModel, TSortable, TFilterable> OrderByDescending<TValue>(Expression<Func<TSortable, TValue>> property)
-        // {
-        // }
+            var clone = Clone();
+            clone.options.SortField = jsonName;
+            clone.options.SortDescending = false;
 
-        // public Filter<TModel, TSortable, TFilterable> WithFilter<TValue>(Expression<Func<TFilterable, TValue>> property, TValue value)
-        // {
-        // }
+            return clone;
+        }
+
+        public Filter<TModel, TSortable, TFilterable> OrderByDescending<TValue>(Expression<Func<TSortable, TValue>> property)
+        {
+            var jsonName = GetPropertyName(property);
+
+            var clone = Clone();
+            clone.options.SortField = jsonName;
+            clone.options.SortDescending = true;
+
+            return clone;
+        }
+
+        public Filter<TModel, TSortable, TFilterable> WithValue<TValue>(Expression<Func<TFilterable, TValue>> property, TValue value)
+        {
+            var jsonName = GetPropertyName(property);
+
+            var clone = Clone();
+            clone.options.Filter.Add(jsonName, $"{value}");
+
+            return clone;
+        }
+
+        public Filter<TModel, TSortable, TFilterable> WithValue(Expression<Func<TFilterable, DateTimeOffset>> property, DateTimeOffset startDate) =>
+            WithDate(property, startDate, new DateTimeOffset(9999, 12, 31, 0, 0, 0, TimeSpan.Zero));
+
+        public Filter<TModel, TSortable, TFilterable> WithValue(Expression<Func<TFilterable, DateTimeOffset>> property, DateTimeOffset startDate, DateTimeOffset endDate) =>
+            WithDate(property, startDate, endDate);
+
+        public Filter<TModel, TSortable, TFilterable> WithValue(Expression<Func<TFilterable, DateTimeOffset?>> property, DateTimeOffset startDate) =>
+            WithDate(property, startDate, new DateTimeOffset(9999, 12, 31, 0, 0, 0, TimeSpan.Zero));
+
+        public Filter<TModel, TSortable, TFilterable> WithValue(Expression<Func<TFilterable, DateTimeOffset?>> property, DateTimeOffset startDate, DateTimeOffset endDate) =>
+            WithDate(property, startDate, endDate);
 
         public Filter<TModel, TSortable, TFilterable> Skip(int offset)
         {
@@ -97,13 +121,7 @@ namespace ComicVineApi.Clients
             return results.FirstOrDefault();
         }
 
-        public async Task<int> CountAsync()
-        {
-            var count = await client.CountAsync<TModel>().ConfigureAwait(false);
-            return (int)count;
-        }
-
-        public Task<long> LongCountAsync() =>
+        public Task<int> CountAsync() =>
             client.CountAsync<TModel>();
 
         public async Task<List<TModel>> ToListAsync()
@@ -116,6 +134,31 @@ namespace ComicVineApi.Clients
         {
             var results = await GetCollectionResultAsync().ConfigureAwait(false);
             return results.ToArray();
+        }
+
+        private Filter<TModel, TSortable, TFilterable> WithDate<TDateType>(Expression<Func<TFilterable, TDateType>> property, DateTimeOffset startDate, DateTimeOffset endDate)
+        {
+            var jsonName = GetPropertyName(property);
+
+            var clone = Clone();
+            clone.options.Filter.Add(jsonName, $"{startDate.UtcDateTime:yyyy-MM-dd}|{endDate.UtcDateTime:yyyy-MM-dd}");
+
+            return clone;
+        }
+
+        private static string GetPropertyName<TObject, TValue>(Expression<Func<TObject, TValue>> property)
+        {
+            _ = property ?? throw new ArgumentNullException(nameof(property));
+
+            var mx = property.Body as MemberExpression;
+            var propertyInfo = mx?.Member as PropertyInfo
+                ?? throw new ArgumentException($"The lambda expression '{nameof(property)}' should point to a valid Property.");
+
+            propertyInfo = typeof(TModel).GetRuntimeProperty(propertyInfo.Name);
+
+            var jsonProperty = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
+            var jsonName = jsonProperty.PropertyName;
+            return jsonName;
         }
 
         private async Task<IEnumerable<TModel>> GetCollectionResultAsync() =>

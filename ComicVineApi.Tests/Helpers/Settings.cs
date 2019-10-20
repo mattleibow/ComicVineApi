@@ -1,6 +1,6 @@
 ﻿namespace ComicVineApi.Tests
 {
-    public static class Configuration
+    public static class Settings
     {
         /// <summary>
         /// The API key from https://comicvine.gamespot.com/api after registering.

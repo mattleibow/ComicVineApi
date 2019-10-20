@@ -1,52 +1,53 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ComicVineApi.Models
 {
     public class IssueDetailed : Issue
     {
         [JsonProperty("character_credits")]
-        public CharacterReference[] CharacterCredits { get; set; }
+        public IReadOnlyList<CharacterReference>? CharacterCredits { get; set; }
 
         [JsonProperty("character_died_in")]
-        public IssueReference[] CharacterDiedIn { get; set; }
+        public IReadOnlyList<IssueReference>? CharacterDiedIn { get; set; }
 
         [JsonProperty("concept_credits")]
-        public ConceptReference[] ConceptCredits { get; set; }
+        public IReadOnlyList<ConceptReference>? ConceptCredits { get; set; }
 
         [JsonProperty("first_appearance_characters")]
-        public CharacterReference[] FirstAppearanceCharacters { get; set; }
+        public IReadOnlyList<CharacterReference>? FirstAppearanceCharacters { get; set; }
 
         [JsonProperty("first_appearance_concepts")]
-        public ConceptReference[] FirstAppearanceConcepts { get; set; }
+        public IReadOnlyList<ConceptReference>? FirstAppearanceConcepts { get; set; }
 
         [JsonProperty("first_appearance_locations")]
-        public LocationReference[] FirstAppearanceLocations { get; set; }
+        public IReadOnlyList<LocationReference>? FirstAppearanceLocations { get; set; }
 
         [JsonProperty("first_appearance_objects")]
-        public ObjectReference[] FirstAppearanceObjects { get; set; }
+        public IReadOnlyList<ObjectReference>? FirstAppearanceObjects { get; set; }
 
         [JsonProperty("first_appearance_storyarcs")]
-        public StoryArcReference[] FirstAppearanceStoryarcs { get; set; }
+        public IReadOnlyList<StoryArcReference>? FirstAppearanceStoryarcs { get; set; }
 
         [JsonProperty("first_appearance_teams")]
-        public TeamReference[] FirstAppearanceTeams { get; set; }
+        public IReadOnlyList<TeamReference>? FirstAppearanceTeams { get; set; }
 
         [JsonProperty("location_credits")]
-        public LocationReference[] LocationCredits { get; set; }
+        public IReadOnlyList<LocationReference>? LocationCredits { get; set; }
 
         [JsonProperty("object_credits")]
-        public ObjectCredit[] ObjectCredits { get; set; }
+        public IReadOnlyList<ObjectCredit>? ObjectCredits { get; set; }
 
         [JsonProperty("person_credits")]
-        public PersonCredit[] PersonCredits { get; set; }
+        public IReadOnlyList<PersonCredit>? PersonCredits { get; set; }
 
         [JsonProperty("story_arc_credits")]
-        public StoryArcReference[] StoryArcCredits { get; set; }
+        public IReadOnlyList<StoryArcReference>? StoryArcCredits { get; set; }
 
         [JsonProperty("team_credits")]
-        public TeamReference[] TeamCredits { get; set; }
+        public IReadOnlyList<TeamReference>? TeamCredits { get; set; }
 
         [JsonProperty("team_disbanded_in")]
-        public TeamReference[] TeamDisbandedIn { get; set; }
+        public IReadOnlyList<TeamReference>? TeamDisbandedIn { get; set; }
     }
 }

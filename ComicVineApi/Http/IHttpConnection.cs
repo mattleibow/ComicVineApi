@@ -9,7 +9,7 @@ namespace ComicVineApi.Http
     {
         string ApiKey { get; }
 
-        bool ThrowExceptionOnMissingFields { get; set; }
+        bool ThrowOnMissingProperties { get; set; }
 
         Task<CollectionResult<T>> FilterAsync<T>(Uri uri, Dictionary<string, object>? options);
 

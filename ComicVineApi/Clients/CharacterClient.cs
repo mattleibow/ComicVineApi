@@ -18,7 +18,7 @@ namespace ComicVineApi.Clients
         public Task<IReadOnlyList<Character>> FilterAsync(FilterOptions options) =>
             FilterAsync<Character>(options);
 
-        public Task<CharacterDetailed> GetAsync(long id) =>
+        public Task<CharacterDetailed> GetAsync(int id) =>
             GetAsync<CharacterDetailed>(id);
     }
 }

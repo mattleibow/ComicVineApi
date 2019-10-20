@@ -1,37 +1,40 @@
-using System;
-using ComicVineApi.Helpers;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace ComicVineApi.Models
 {
     public class Publisher : PublisherReference
     {
+        [JsonProperty("resource_type")]
+        internal string? resourceType;
+
         [JsonProperty("aliases")]
         [JsonConverter(typeof(NewlineDelimitedArrayConverter))]
-        public string[] Aliases { get; set; }
+        public IReadOnlyList<string>? Aliases { get; set; }
 
         [JsonProperty("date_added")]
-        public DateTimeOffset DateAdded { get; set; }
+        public DateTimeOffset? DateAdded { get; set; }
 
         [JsonProperty("date_last_updated")]
-        public DateTimeOffset DateLastUpdated { get; set; }
+        public DateTimeOffset? DateLastUpdated { get; set; }
 
         [JsonProperty("deck")]
-        public string Deck { get; set; }
+        public string? Deck { get; set; }
 
         [JsonProperty("description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [JsonProperty("image")]
-        public Image Image { get; set; }
+        public Image? Image { get; set; }
 
         [JsonProperty("location_address")]
-        public string LocationAddress { get; set; }
+        public string? LocationAddress { get; set; }
 
         [JsonProperty("location_city")]
-        public string LocationCity { get; set; }
+        public string? LocationCity { get; set; }
 
         [JsonProperty("location_state")]
-        public string LocationState { get; set; }
+        public string? LocationState { get; set; }
     }
 }

@@ -1,20 +1,25 @@
-﻿using ComicVineApi.Clients;
+﻿using System;
+using ComicVineApi.Clients;
 using ComicVineApi.Http;
 
 namespace ComicVineApi
 {
-    public class ComicVineClient
+    public class ComicVineClient : IDisposable
     {
-        private readonly IHttpConnection connection;
+        private readonly HttpMessenger httpMessenger;
+        private readonly IHttpConnection httpConnection;
+        private readonly ApiConnection apiConnection;
 
         public ComicVineClient(string apiKey, string? userAgent = null)
         {
-            connection = new HttpConnection(apiKey, userAgent);
+            httpMessenger = new HttpMessenger(userAgent);
+            httpConnection = new HttpConnection(httpMessenger, apiKey);
+            apiConnection = new ApiConnection(httpConnection);
 
-            var apiConnection = new ApiConnection(connection);
             Character = new CharacterClient(apiConnection);
             Series = new SeriesClient(apiConnection);
             Issue = new IssueClient(apiConnection);
+            Volume = new VolumeClient(apiConnection);
         }
 
         public CharacterClient Character { get; }
@@ -23,10 +28,26 @@ namespace ComicVineApi
 
         public IssueClient Issue { get; }
 
-        internal bool ThrowExceptionOnMissingFields
+        public VolumeClient Volume { get; }
+
+        public SearchClient Serach { get; }
+
+        internal HttpMessenger HttpMessenger => httpMessenger;
+
+        internal IHttpConnection HttpConnection => httpConnection;
+
+        internal ApiConnection ApiConnection => apiConnection;
+
+        protected virtual void Dispose(bool disposing)
         {
-            get => connection.ThrowExceptionOnMissingFields;
-            set => connection.ThrowExceptionOnMissingFields = value;
+            if (disposing)
+                httpMessenger.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

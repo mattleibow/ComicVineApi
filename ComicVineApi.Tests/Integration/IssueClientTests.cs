@@ -13,8 +13,7 @@ namespace ComicVineApi.Tests.Integration
             public async Task ReturnsCorrectData()
             {
                 // arrange
-                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
-                client.ThrowExceptionOnMissingFields = true;
+                using var client = new ComicVineClient(Settings.ApiKey, Settings.UserAgent);
 
                 // act
                 var results = await client.Issue.Filter()
@@ -29,20 +28,19 @@ namespace ComicVineApi.Tests.Integration
         public class TheGetAsyncMethod
         {
             [Theory]
-            [InlineData(6, "The Lost Race", 13)]
-            [InlineData(10, null, 73)]
-            public async Task ReturnsCorrectData(int id, string name, int number)
+            [InlineData(6, "The Lost Race", "13")]
+            [InlineData(10, null, "73")]
+            public async Task ReturnsCorrectData(int id, string name, string number)
             {
                 // arrange
-                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
-                client.ThrowExceptionOnMissingFields = true;
+                using var client = new ComicVineClient(Settings.ApiKey, Settings.UserAgent);
 
                 // act
                 var result = await client.Issue.GetAsync(id);
 
                 // assert
                 Assert.Equal(name, result.Name);
-                Assert.Equal(number.ToString(), result.IssueNumber);
+                Assert.Equal(number, result.IssueNumber);
             }
         }
 
@@ -52,8 +50,7 @@ namespace ComicVineApi.Tests.Integration
             public async Task ReturnsCorrectData()
             {
                 // arrange
-                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
-                client.ThrowExceptionOnMissingFields = true;
+                using var client = new ComicVineClient(Settings.ApiKey, Settings.UserAgent);
                 var detailed = new List<IssueDetailed>();
 
                 // act
@@ -62,7 +59,7 @@ namespace ComicVineApi.Tests.Integration
                     .ToListAsync();
                 foreach (var result in results)
                 {
-                    var res = await client.Issue.GetAsync(result.Id);
+                    var res = await client.Issue.GetAsync(result.Id!.Value);
                     detailed.Add(res);
                 }
 

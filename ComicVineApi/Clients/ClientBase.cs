@@ -22,7 +22,7 @@ namespace ComicVineApi.Clients
 
         protected IApiConnection ApiConnection { get; }
 
-        protected internal async Task<long> CountAsync<T>()
+        protected internal async Task<int> CountAsync<T>()
         {
             var options = new FilterOptions();
             options.FieldList.Add("id");
@@ -41,7 +41,7 @@ namespace ComicVineApi.Clients
             return result.Results;
         }
 
-        protected internal async Task<T> GetAsync<T>(long id)
+        protected internal async Task<T> GetAsync<T>(int id)
         {
             var uri = new Uri($"{getResource}/{endpointId}-{id}", UriKind.Relative);
             var result = await ApiConnection.GetAsync<T>(uri).ConfigureAwait(false);

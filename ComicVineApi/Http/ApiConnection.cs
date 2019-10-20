@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ComicVineApi.Clients;
 using ComicVineApi.Models;
@@ -26,6 +27,16 @@ namespace ComicVineApi.Http
                 dictionary.Add("limit", options.Limit);
                 if (options.FieldList?.Count > 0)
                     dictionary.Add("field_list", string.Join(",", options.FieldList));
+                if (!string.IsNullOrWhiteSpace(options.SortField))
+                {
+                    var dir = options.SortDescending ? "desc" : "asc";
+                    dictionary.Add("sort", $"{options.SortField}:{dir}");
+                }
+                if (options.Filter?.Count > 0)
+                {
+                    var filters = options.Filter.Select(x => $"{x.Key}:{x.Value}");
+                    dictionary.Add("filter", string.Join(",", filters));
+                }
             }
 
             return Connection.FilterAsync<T>(uri, dictionary);

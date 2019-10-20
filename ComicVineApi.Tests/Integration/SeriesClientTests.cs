@@ -13,8 +13,7 @@ namespace ComicVineApi.Tests.Integration
             public async Task ReturnsCorrectData()
             {
                 // arrange
-                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
-                client.ThrowExceptionOnMissingFields = true;
+                using var client = new ComicVineClient(Settings.ApiKey, Settings.UserAgent);
 
                 // act
                 var results = await client.Series.Filter()
@@ -34,8 +33,7 @@ namespace ComicVineApi.Tests.Integration
             public async Task ReturnsCorrectData(int id, string name)
             {
                 // arrange
-                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
-                client.ThrowExceptionOnMissingFields = true;
+                using var client = new ComicVineClient(Settings.ApiKey, Settings.UserAgent);
 
                 // act
                 var result = await client.Series.GetAsync(id);
@@ -51,8 +49,7 @@ namespace ComicVineApi.Tests.Integration
             public async Task ReturnsCorrectData()
             {
                 // arrange
-                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
-                client.ThrowExceptionOnMissingFields = true;
+                using var client = new ComicVineClient(Settings.ApiKey, Settings.UserAgent);
                 var detailed = new List<SeriesDetailed>();
 
                 // act
@@ -61,7 +58,7 @@ namespace ComicVineApi.Tests.Integration
                     .ToListAsync();
                 foreach (var result in results)
                 {
-                    var res = await client.Series.GetAsync(result.Id);
+                    var res = await client.Series.GetAsync(result.Id!.Value);
                     detailed.Add(res);
                 }
 

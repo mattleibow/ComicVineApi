@@ -13,8 +13,7 @@ namespace ComicVineApi.Tests.Integration
             public async Task ReturnsCorrectData()
             {
                 // arrange
-                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
-                client.ThrowExceptionOnMissingFields = true;
+                using var client = new ComicVineClient(Settings.ApiKey, Settings.UserAgent);
 
                 // act
                 var results = await client.Character.Filter()
@@ -23,6 +22,27 @@ namespace ComicVineApi.Tests.Integration
 
                 // assert
                 Assert.Equal(3, results.Count);
+            }
+
+            [Fact]
+            public async Task CanFindRedHood()
+            {
+                // arrange
+                using var client = new ComicVineClient(Settings.ApiKey, Settings.UserAgent);
+
+                // act
+                var results = await client.Character.Filter()
+                    .IncludeField(x => x.Id)
+                    .IncludeField(x => x.Name)
+                    .IncludeField(x => x.Aliases)
+                    .IncludeField(x => x.Deck)
+                    .Take(5)
+                    .WithValue(x => x.Name, "Jason Todd")
+                    .ToListAsync();
+
+                // assert
+                Assert.Single(results);
+                Assert.Contains("Red Hood", results[0].Aliases);
             }
         }
 
@@ -33,8 +53,7 @@ namespace ComicVineApi.Tests.Integration
             public async Task ReturnsCorrectData(int id, string name)
             {
                 // arrange
-                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
-                client.ThrowExceptionOnMissingFields = true;
+                using var client = new ComicVineClient(Settings.ApiKey, Settings.UserAgent);
 
                 // act
                 var result = await client.Character.GetAsync(id);
@@ -50,8 +69,7 @@ namespace ComicVineApi.Tests.Integration
             public async Task ReturnsCorrectData()
             {
                 // arrange
-                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
-                client.ThrowExceptionOnMissingFields = true;
+                using var client = new ComicVineClient(Settings.ApiKey, Settings.UserAgent);
                 var detailed = new List<CharacterDetailed>();
 
                 // act
@@ -60,7 +78,7 @@ namespace ComicVineApi.Tests.Integration
                     .ToListAsync();
                 foreach (var result in results)
                 {
-                    var res = await client.Character.GetAsync(result.Id);
+                    var res = await client.Character.GetAsync(result.Id!.Value);
                     detailed.Add(res);
                 }
 

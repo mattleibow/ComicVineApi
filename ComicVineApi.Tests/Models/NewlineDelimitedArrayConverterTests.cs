@@ -1,16 +1,17 @@
-﻿using ComicVineApi.Helpers;
+﻿using ComicVineApi.Models;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace ComicVineApi.Tests.Helpers
+namespace ComicVineApi.Tests.Models
 {
     public class NewlineDelimitedArrayConverterTests
     {
         [Theory]
         [InlineData("null", null)]
-        [InlineData("''", new [] { "" })]
-        [InlineData("'first'", new [] { "first" })]
-        [InlineData("'first\\nsecond\\nthird'", new [] { "first", "second", "third" })]
+        [InlineData("''", new string[0])]
+        [InlineData("'first'", new[] { "first" })]
+        [InlineData("'first\\nsecond\\nthird'", new[] { "first", "second", "third" })]
+        [InlineData("'first\\r\\nsecond\\r\\nthird'", new[] { "first", "second", "third" })]
         public void ConvertsCorrectly(string value, string[] array)
         {
             // arrange
@@ -26,7 +27,7 @@ namespace ComicVineApi.Tests.Helpers
         public class TestObject
         {
             [JsonConverter(typeof(NewlineDelimitedArrayConverter))]
-            public string[] Array { get; set; }
+            public string[]? Array { get; set; }
         }
     }
 }

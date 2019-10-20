@@ -1,25 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ComicVineApi.Models
 {
     public interface IIssueFilterable
     {
-        string[] Aliases { get; set; }
+        IReadOnlyList<string>? Aliases { get; set; }
 
         DateTimeOffset? CoverDate { get; set; }
 
-        DateTimeOffset DateAdded { get; set; }
+        DateTimeOffset? DateAdded { get; set; }
 
-        DateTimeOffset DateLastUpdated { get; set; }
+        DateTimeOffset? DateLastUpdated { get; set; }
 
-        long Id { get; set; }
+        int? Id { get; set; }
 
-        string IssueNumber { get; set; }
+        string? IssueNumber { get; set; }
 
-        string Name { get; set; }
+        string? Name { get; set; }
 
         DateTimeOffset? StoreDate { get; set; }
 
-        VolumeReference Volume { get; set; }
+        VolumeReference? Volume { get; set; }
     }
 }

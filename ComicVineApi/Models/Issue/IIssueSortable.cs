@@ -6,15 +6,15 @@ namespace ComicVineApi.Models
     {
         DateTimeOffset? CoverDate { get; set; }
 
-        DateTimeOffset DateAdded { get; set; }
+        DateTimeOffset? DateAdded { get; set; }
 
-        DateTimeOffset DateLastUpdated { get; set; }
+        DateTimeOffset? DateLastUpdated { get; set; }
 
-        long Id { get; set; }
+        int? Id { get; set; }
 
-        string IssueNumber { get; set; }
+        string? IssueNumber { get; set; }
 
-        string Name { get; set; }
+        string? Name { get; set; }
 
         DateTimeOffset? StoreDate { get; set; }
     }

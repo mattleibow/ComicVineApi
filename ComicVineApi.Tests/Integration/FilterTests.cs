@@ -11,8 +11,7 @@ namespace ComicVineApi.Tests.Integration
             public async Task ReturnsCorrectData()
             {
                 // arrange
-                var client = new ComicVineClient(Configuration.ApiKey, Configuration.UserAgent);
-                client.ThrowExceptionOnMissingFields = true;
+                var client = new ComicVineClient(Settings.ApiKey, Settings.UserAgent);
 
                 // act
                 var series = await client.Series.Filter()

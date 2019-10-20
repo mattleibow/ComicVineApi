@@ -1,4 +1,4 @@
-namespace ComicVineApi.Models
+﻿namespace ComicVineApi.Models
 {
     public class VolumeReference : Reference
     {

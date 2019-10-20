@@ -1,5 +1,5 @@
 ﻿using System;
-using ComicVineApi.Helpers;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace ComicVineApi.Models
@@ -8,33 +8,33 @@ namespace ComicVineApi.Models
     {
         [JsonProperty("aliases")]
         [JsonConverter(typeof(NewlineDelimitedArrayConverter))]
-        public string[] Aliases { get; set; }
+        public IReadOnlyList<string>? Aliases { get; set; }
 
         [JsonProperty("cover_date")]
         public DateTimeOffset? CoverDate { get; set; }
 
         [JsonProperty("date_added")]
-        public DateTimeOffset DateAdded { get; set; }
+        public DateTimeOffset? DateAdded { get; set; }
 
         [JsonProperty("date_last_updated")]
-        public DateTimeOffset DateLastUpdated { get; set; }
+        public DateTimeOffset? DateLastUpdated { get; set; }
 
         [JsonProperty("deck")]
-        public string Deck { get; set; }
+        public string? Deck { get; set; }
 
         [JsonProperty("description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [JsonProperty("has_staff_review")]
-        public bool HasStaffReview { get; set; }
+        public bool? HasStaffReview { get; set; }
 
         [JsonProperty("image")]
-        public Image Image { get; set; }
+        public Image? Image { get; set; }
 
         [JsonProperty("store_date")]
         public DateTimeOffset? StoreDate { get; set; }
 
         [JsonProperty("volume")]
-        public VolumeReference Volume { get; set; }
+        public VolumeReference? Volume { get; set; }
     }
 }

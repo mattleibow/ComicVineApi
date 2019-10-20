@@ -6,7 +6,7 @@ using ComicVineApi.Models;
 using NSubstitute;
 using Xunit;
 
-namespace ComicVineApi.Tests.Clients
+namespace ComicVineApi.Tests.Http
 {
     public class ApiConnectionTests
     {
