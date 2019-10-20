@@ -1,6 +1,3 @@
-
-<img align="right" width="150" src="https://comicvine1.cbsistatic.com/bundles/comicvinesite/images/logo.png" />
-
 # Comic Vine API
 
 [![Build Status](https://dev.azure.com/mattleibow/OpenSource/_apis/build/status/ComicVineApi?branchName=master)](https://dev.azure.com/mattleibow/OpenSource/_build/latest?definitionId=24&branchName=master)
