@@ -1,8 +1,8 @@
-<img align="right" width="200" src="https://comicvine1.cbsistatic.com/bundles/comicvinesite/images/logo.png" float="right" max-width="100" />
-
 # Comic Vine API
 
 [![Build Status](https://dev.azure.com/mattleibow/OpenSource/_apis/build/status/ComicVineApi?branchName=master)](https://dev.azure.com/mattleibow/OpenSource/_build/latest?definitionId=24&branchName=master)
+
+<img align="right" width="200" src="https://comicvine1.cbsistatic.com/bundles/comicvinesite/images/logo.png" float="right" max-width="100" />
 
 A beautiful .NET API that wraps the awesome Comic Vine REST API.
 
