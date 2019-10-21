@@ -1,6 +1,6 @@
 namespace ComicVineApi.Models
 {
-    public class StoryArcReference : Reference
+    public class StoryArcReference : ComicVineObject
     {
     }
 }

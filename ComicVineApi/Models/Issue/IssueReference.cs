@@ -2,7 +2,7 @@
 
 namespace ComicVineApi.Models
 {
-    public class IssueReference : Reference
+    public class IssueReference : ComicVineObject
     {
         [JsonProperty("issue_number")]
         public string? IssueNumber { get; set; }

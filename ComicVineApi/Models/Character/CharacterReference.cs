@@ -2,7 +2,7 @@
 
 namespace ComicVineApi.Models
 {
-    public class CharacterReference : Reference
+    public class CharacterReference : ComicVineObject
     {
         [JsonProperty("count")]
         public int? Count { get; set; }

@@ -1,6 +1,6 @@
 namespace ComicVineApi.Models
 {
-    public class ObjectCredit : Reference
+    public class ObjectCredit : ComicVineObject
     {
     }
 }

@@ -6,9 +6,6 @@ namespace ComicVineApi.Models
 {
     public class Volume : VolumeReference, IVolumeSortable, IVolumeFilterable
     {
-        [JsonProperty("resource_type")]
-        internal string? resourceType;
-
         [JsonProperty("aliases")]
         [JsonConverter(typeof(NewlineDelimitedArrayConverter))]
         public IReadOnlyList<string>? Aliases { get; set; }

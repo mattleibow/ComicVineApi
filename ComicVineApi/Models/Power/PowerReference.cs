@@ -1,6 +1,6 @@
 namespace ComicVineApi.Models
 {
-    public class PowerReference : Reference
+    public class PowerReference : ComicVineObject
     {
     }
 }

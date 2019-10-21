@@ -6,9 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace ComicVineApi.Models
 {
-    internal class HeterogenousArrayConverter : CustomCreationConverter<object>
+    internal class HeterogenousArrayConverter : CustomCreationConverter<IReadOnlyList<ComicVineObject>>
     {
-        public override object Create(Type objectType) =>
+        public override IReadOnlyList<ComicVineObject> Create(Type objectType) =>
             throw new NotImplementedException();
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -16,7 +16,7 @@ namespace ComicVineApi.Models
             // Load JObject from stream
             var array = JArray.Load(reader);
 
-            var resArray = new List<object>(array.Count);
+            var resArray = new List<ComicVineObject>(array.Count);
             foreach (JObject item in array)
             {
                 // Create target object based on JObject 
@@ -35,7 +35,7 @@ namespace ComicVineApi.Models
             return resArray.ToArray();
         }
 
-        private object? Create(string type, JsonSerializer serializer)
+        private ComicVineObject? Create(string type, JsonSerializer serializer)
         {
             switch (type)
             {

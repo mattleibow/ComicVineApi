@@ -18,7 +18,18 @@ There are 3 main ways to find/fetch information:
 
 ### 1. Request
 
-> TODO: add docs
+For each of the resources, you can esily request a specific item in 1 line of code:
+
+```csharp
+// create the client
+var client = new ComicVineClient("<API-KEY>", "<CUSTOM-USER-AGENT>");
+
+// request the Batgirl (Cassandra Cain) character
+var cassie = await client.Character.GetAsync(65230);
+
+// print something out
+Console.WriteLine($"{cassie.Name} was born on {cassie.Birth}.");
+```
 
 ### 2. Filter
 

@@ -1,6 +1,6 @@
 ﻿namespace ComicVineApi.Models
 {
-    public class VolumeReference : Reference
+    public class VolumeReference : ComicVineObject
     {
     }
 }

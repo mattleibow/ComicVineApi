@@ -1,6 +1,6 @@
 namespace ComicVineApi.Models
 {
-    public class OriginReference : Reference
+    public class OriginReference : ComicVineObject
     {
     }
 }

@@ -1,6 +1,6 @@
 namespace ComicVineApi.Models
 {
-    public class TeamReference : Reference
+    public class TeamReference : ComicVineObject
     {
     }
 }

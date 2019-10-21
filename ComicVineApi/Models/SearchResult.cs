@@ -7,6 +7,6 @@ namespace ComicVineApi.Models
     {
         [JsonProperty("results")]
         [JsonConverter(typeof(HeterogenousArrayConverter))]
-        public IReadOnlyList<object> Results { get; set; }
+        public IReadOnlyList<ComicVineObject> Results { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 namespace ComicVineApi.Models
 {
-    public class MovieReference : Reference
+    public class MovieReference : ComicVineObject
     {
     }
 }

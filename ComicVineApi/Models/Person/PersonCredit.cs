@@ -2,7 +2,7 @@
 
 namespace ComicVineApi.Models
 {
-    public class PersonCredit : Reference
+    public class PersonCredit : ComicVineObject
     {
         [JsonProperty("role")]
         public string? Role { get; set; }

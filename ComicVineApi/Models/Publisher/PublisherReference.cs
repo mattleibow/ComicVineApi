@@ -1,6 +1,6 @@
 namespace ComicVineApi.Models
 {
-    public class PublisherReference : Reference
+    public class PublisherReference : ComicVineObject
     {
     }
 }
