@@ -19,7 +19,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ComicVineApi.Tests\ComicVineApi.Tests.csproj" />
     <ProjectReference Include="..\ComicVineApi\ComicVineApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\ComicVineApi.Tests\GlobalSuppressions.cs" />
   </ItemGroup>
 
 </Project>

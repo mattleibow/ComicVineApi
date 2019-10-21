@@ -32,7 +32,7 @@ steps:
   - powershell: dotnet pack -v $(VERBOSITY) -c Release -o output
     displayName: Run build
 
-  - powershell: dotnet test -v $(VERBOSITY) -c Release -r output -l trx
+  - powershell: dotnet test ComicVineApi.Tests/ComicVineApi.Tests.csproj -v $(VERBOSITY) -c Release -r output -l trx
     displayName: Run tests
 
   - task: PublishBuildArtifacts@1

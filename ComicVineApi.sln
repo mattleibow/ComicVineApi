@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComicVineApi.Tests.Integration", "ComicVineApi.Tests.Integration\ComicVineApi.Tests.Integration.csproj", "{2BAD70FB-BF97-432D-BAED-4EA829ECDA1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{CACBCC98-F429-4469-8E00-5958F5E49BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CACBCC98-F429-4469-8E00-5958F5E49BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CACBCC98-F429-4469-8E00-5958F5E49BCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BAD70FB-BF97-432D-BAED-4EA829ECDA1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BAD70FB-BF97-432D-BAED-4EA829ECDA1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BAD70FB-BF97-432D-BAED-4EA829ECDA1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BAD70FB-BF97-432D-BAED-4EA829ECDA1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
