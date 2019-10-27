@@ -426,25 +426,9 @@ namespace ComicVineApi.Tests.Clients
             public async Task FetchesTheCorrectAmount(int desiredSize, int actualSize)
             {
                 // arrange
+                var actual = Enumerable.Range(1, actualSize).ToList();
                 var httpConnection = Substitute.For<IHttpConnection>();
-                CreateFilterResultsCalls(httpConnection);
-                var apiConnection = new ApiConnection(httpConnection);
-                var client = new TestClient(apiConnection);
-
-                // act
-                var filter = client.Filter()
-                    .Take(desiredSize);
-                //.ToAsyncEnumerable();
-                var results = new List<int>();
-                await foreach (var res in ToAsyncEnumerable(filter))
-                    results.Add(res.Id!.Value);
-
-                // assert
-                Assert.Equal(Enumerable.Range(1, actualSize), results);
-            }
-
-            private static void CreateFilterResultsCalls(IHttpConnection httpConnection)
-            {
+                // page 1 has 10 items
                 httpConnection
                     .FilterAsync<TestModel>(
                         Arg.Any<Uri>(),
@@ -455,6 +439,7 @@ namespace ComicVineApi.Tests.Clients
                             .Select(i => new TestModel { Id = i })
                             .ToArray()
                     }));
+                // page 2 has 10 items
                 httpConnection
                     .FilterAsync<TestModel>(
                         Arg.Any<Uri>(),
@@ -465,6 +450,7 @@ namespace ComicVineApi.Tests.Clients
                             .Select(i => new TestModel { Id = i })
                             .ToArray()
                     }));
+                // page 1 has 10 items
                 httpConnection
                     .FilterAsync<TestModel>(
                         Arg.Any<Uri>(),
@@ -473,34 +459,89 @@ namespace ComicVineApi.Tests.Clients
                     {
                         Results = Array.Empty<TestModel>()
                     }));
+                var apiConnection = new ApiConnection(httpConnection);
+                var client = new TestClient(apiConnection);
+
+                // act
+                var enumerable = client.Filter()
+                    .Take(desiredSize)
+                    .ToAsyncEnumerable();
+                var results = new List<int>();
+                await foreach (var res in enumerable)
+                    results.Add(res.Id!.Value);
+
+                // assert
+                Assert.Equal(actual, results);
             }
 
-            public async IAsyncEnumerable<TModel> ToAsyncEnumerable<TModel, TSortable, TFilterable>(Filter<TModel, TSortable, TFilterable> filter)
-                where TModel : ComicVineObject, TSortable, TFilterable
+            [Theory]
+            [InlineData(0, 0)]
+            [InlineData(5, 5)]
+            [InlineData(10, 10)]
+            [InlineData(15, 15)]
+            [InlineData(20, 20)]
+            [InlineData(25, 20)]
+            [InlineData(100, 20)]
+            public async Task FetchesTheCorrectAmountWithPartialPage(int desiredSize, int actualSize)
             {
-                var options = filter.ToOptions();
-                var client = filter.client;
+                // arrange
+                var actual = Enumerable.Range(1, actualSize).ToList();
+                var httpConnection = Substitute.For<IHttpConnection>();
+                // page 1 has 10 items
+                httpConnection
+                    .FilterAsync<TestModel>(
+                        Arg.Any<Uri>(),
+                        Arg.Is<Dictionary<string, object>>(o => o["offset"].Equals(0)))
+                    .Returns(Task.FromResult(new CollectionResult<TestModel>
+                    {
+                        Results = Enumerable.Range(1, 10)
+                            .Select(i => new TestModel { Id = i })
+                            .ToArray()
+                    }));
+                // page 2 has 10 items
+                httpConnection
+                    .FilterAsync<TestModel>(
+                        Arg.Any<Uri>(),
+                        Arg.Is<Dictionary<string, object>>(o => o["offset"].Equals(10)))
+                    .Returns(Task.FromResult(new CollectionResult<TestModel>
+                    {
+                        Results = Enumerable.Range(11, 10)
+                            .Select(i => new TestModel { Id = i })
+                            .ToArray()
+                    }));
+                // page 3 has 4 items
+                httpConnection
+                    .FilterAsync<TestModel>(
+                        Arg.Any<Uri>(),
+                        Arg.Is<Dictionary<string, object>>(o => o["offset"].Equals(20)))
+                    .Returns(Task.FromResult(new CollectionResult<TestModel>
+                    {
+                        Results = Enumerable.Range(11, 4)
+                            .Select(i => new TestModel { Id = i })
+                            .ToArray()
+                    }));
+                // the rest have 0 itemsc
+                httpConnection
+                    .FilterAsync<TestModel>(
+                        Arg.Any<Uri>(),
+                        Arg.Is<Dictionary<string, object>>(o => (int)o["offset"] > 20))
+                    .Returns(Task.FromResult(new CollectionResult<TestModel>
+                    {
+                        Results = Array.Empty<TestModel>()
+                    }));
+                var apiConnection = new ApiConnection(httpConnection);
+                var client = new TestClient(apiConnection);
 
-                var itemsSoFar = 0;
+                // act
+                var enumerable = client.Filter()
+                    .Take(desiredSize)
+                    .ToAsyncEnumerable();
+                var results = new List<int>();
+                await foreach (var res in enumerable)
+                    results.Add(res.Id!.Value);
 
-                // don't request more than we need
-                while (itemsSoFar < options.Limit)
-                {
-                    var results = await client.FilterAsync<TModel>(options);
-
-                    // no more items in the source
-                    if (results.Count == 0)
-                        yield break;
-
-                    // just return the requested amount
-                    var limited = results.Take(options.Limit - itemsSoFar);
-                    foreach (var res in limited)
-                        yield return res;
-
-                    options.Offset += results.Count;
-                    options.Limit -= results.Count;
-                    itemsSoFar += results.Count;
-                }
+                // assert
+                Assert.Equal(actual, results);
             }
         }
     }

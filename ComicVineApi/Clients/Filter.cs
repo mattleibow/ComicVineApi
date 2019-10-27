@@ -140,6 +140,29 @@ namespace ComicVineApi.Clients
         public FilterOptions ToOptions() =>
             new FilterOptions(options);
 
+        public async IAsyncEnumerable<TModel> ToAsyncEnumerable()
+        {
+            var opt = new FilterOptions(options);
+
+            // don't request more than we need
+            while (opt.Limit > 0)
+            {
+                var results = await client.FilterAsync<TModel>(opt).ConfigureAwait(false);
+
+                // no more items in the source
+                if (results.Count == 0)
+                    yield break;
+
+                // just return the requested amount
+                var limited = results;
+                foreach (var res in limited)
+                    yield return res;
+
+                opt.Offset += results.Count;
+                opt.Limit -= results.Count;
+            }
+        }
+
         private Filter<TModel, TSortable, TFilterable> WithDate<TDateType>(Expression<Func<TFilterable, TDateType>> property, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var jsonName = GetPropertyName(property);
