@@ -16,6 +16,7 @@ namespace ComicVineApi
             Series = new SeriesClient(ApiConnection);
             Issue = new IssueClient(ApiConnection);
             Volume = new VolumeClient(ApiConnection);
+            Search = new SearchClient(ApiConnection);
         }
 
         public CharacterClient Character { get; }

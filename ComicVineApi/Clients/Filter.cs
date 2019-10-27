@@ -4,23 +4,24 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using ComicVineApi.Models;
 using Newtonsoft.Json;
 
 namespace ComicVineApi.Clients
 {
     public class Filter<TModel, TSortable, TFilterable>
-        where TModel : TSortable, TFilterable
+        where TModel : ComicVineObject, TSortable, TFilterable
     {
-        private readonly ClientBase client;
+        internal readonly ClientBase client;
         private readonly FilterOptions options;
 
         internal Filter(ClientBase client, FilterOptions? options = null)
         {
-            this.client = client;
+            this.client = client ?? throw new ArgumentNullException(nameof(client));
             this.options = options ?? new FilterOptions();
         }
 
-        public Filter<TModel, TSortable, TFilterable> IncludeField<TValue>(Expression<Func<TModel, TValue>> property)
+        public Filter<TModel, TSortable, TFilterable> IncludeField(Expression<Func<TModel, object?>> property)
         {
             var jsonName = GetPropertyName(property);
 
@@ -30,7 +31,7 @@ namespace ComicVineApi.Clients
             return clone;
         }
 
-        public Filter<TModel, TSortable, TFilterable> OrderBy<TValue>(Expression<Func<TSortable, TValue>> property)
+        public Filter<TModel, TSortable, TFilterable> OrderBy(Expression<Func<TSortable, object?>> property)
         {
             var jsonName = GetPropertyName(property);
 
@@ -41,7 +42,7 @@ namespace ComicVineApi.Clients
             return clone;
         }
 
-        public Filter<TModel, TSortable, TFilterable> OrderByDescending<TValue>(Expression<Func<TSortable, TValue>> property)
+        public Filter<TModel, TSortable, TFilterable> OrderByDescending(Expression<Func<TSortable, object?>> property)
         {
             var jsonName = GetPropertyName(property);
 
@@ -136,6 +137,9 @@ namespace ComicVineApi.Clients
             return results.ToArray();
         }
 
+        public FilterOptions ToOptions() =>
+            new FilterOptions(options);
+
         private Filter<TModel, TSortable, TFilterable> WithDate<TDateType>(Expression<Func<TFilterable, TDateType>> property, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var jsonName = GetPropertyName(property);
@@ -151,8 +155,14 @@ namespace ComicVineApi.Clients
             _ = property ?? throw new ArgumentNullException(nameof(property));
 
             var mx = property.Body as MemberExpression;
+            if (mx == null)
+            {
+                var unary = property.Body as UnaryExpression;
+                if (unary?.NodeType == ExpressionType.Convert)
+                    mx = unary.Operand as MemberExpression;
+            }
             var propertyInfo = mx?.Member as PropertyInfo
-                ?? throw new ArgumentException($"The lambda expression '{nameof(property)}' should point to a valid Property.");
+                ?? throw new ArgumentException($"The lambda expression '{property}' should point to a valid Property.");
 
             propertyInfo = typeof(TModel).GetRuntimeProperty(propertyInfo.Name);
 

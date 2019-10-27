@@ -1,13 +1,11 @@
 ﻿using System;
+using ComicVineApi.Models;
 using Newtonsoft.Json;
 
 namespace ComicVineApi.Tests
 {
-    public class TestModel : ITestModelSortable, ITestModelFilterable
+    public class TestModel : ComicVineObject, ITestModelSortable, ITestModelFilterable
     {
-        [JsonProperty("id")]
-        public int? Id { get; set; }
-
         [JsonProperty("first_name")]
         public string? FirstName { get; set; }
 

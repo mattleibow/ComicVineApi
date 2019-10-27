@@ -48,5 +48,24 @@ namespace ComicVineApi.Http
 
             return Connection.GetAsync<T>(uri);
         }
+
+        public Task<SearchResult> SearchAsync(Uri uri, SearchOptions? options = null)
+        {
+            _ = uri ?? throw new ArgumentNullException(nameof(uri));
+
+            var dictionary = new Dictionary<string, object>();
+            if (options != null)
+            {
+                dictionary.Add("offset", options.Offset);
+                dictionary.Add("limit", options.Limit);
+                dictionary.Add("query", options.Query);
+                if (options.FieldList?.Count > 0)
+                    dictionary.Add("field_list", string.Join(",", options.FieldList));
+                if (options.Resources?.Count > 0)
+                    dictionary.Add("resources", string.Join(",", options.Resources));
+            }
+
+            return Connection.SearchAsync(uri, dictionary);
+        }
     }
 }

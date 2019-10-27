@@ -12,5 +12,7 @@ namespace ComicVineApi.Http
         Task<CollectionResult<T>> FilterAsync<T>(Uri uri, FilterOptions? options = null);
 
         Task<SingleResult<T>> GetAsync<T>(Uri uri);
+
+        Task<SearchResult> SearchAsync(Uri uri, SearchOptions? options = null);
     }
 }

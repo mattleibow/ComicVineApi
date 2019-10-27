@@ -20,5 +20,8 @@ namespace ComicVineApi.Clients
 
         public Task<SeriesDetailed> GetAsync(int id) =>
             GetAsync<SeriesDetailed>(id);
+
+        public Task<int> CountAsync() =>
+            CountAsync<Series>();
     }
 }
