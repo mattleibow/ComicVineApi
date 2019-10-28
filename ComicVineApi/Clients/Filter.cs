@@ -154,7 +154,7 @@ namespace ComicVineApi.Clients
                     yield break;
 
                 // just return the requested amount
-                var limited = results;
+                var limited = results.Take(opt.Limit);
                 foreach (var res in limited)
                     yield return res;
 

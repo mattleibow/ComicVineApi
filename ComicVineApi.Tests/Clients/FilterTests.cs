@@ -428,37 +428,9 @@ namespace ComicVineApi.Tests.Clients
                 // arrange
                 var actual = Enumerable.Range(1, actualSize).ToList();
                 var httpConnection = Substitute.For<IHttpConnection>();
-                // page 1 has 10 items
-                httpConnection
-                    .FilterAsync<TestModel>(
-                        Arg.Any<Uri>(),
-                        Arg.Is<Dictionary<string, object>>(o => o["offset"].Equals(0)))
-                    .Returns(Task.FromResult(new CollectionResult<TestModel>
-                    {
-                        Results = Enumerable.Range(1, 10)
-                            .Select(i => new TestModel { Id = i })
-                            .ToArray()
-                    }));
-                // page 2 has 10 items
-                httpConnection
-                    .FilterAsync<TestModel>(
-                        Arg.Any<Uri>(),
-                        Arg.Is<Dictionary<string, object>>(o => o["offset"].Equals(10)))
-                    .Returns(Task.FromResult(new CollectionResult<TestModel>
-                    {
-                        Results = Enumerable.Range(11, 10)
-                            .Select(i => new TestModel { Id = i })
-                            .ToArray()
-                    }));
-                // page 1 has 10 items
-                httpConnection
-                    .FilterAsync<TestModel>(
-                        Arg.Any<Uri>(),
-                        Arg.Is<Dictionary<string, object>>(o => (int)o["offset"] > 10))
-                    .Returns(Task.FromResult(new CollectionResult<TestModel>
-                    {
-                        Results = Array.Empty<TestModel>()
-                    }));
+                AddCall(httpConnection, 0, 10);
+                AddCall(httpConnection, 10, 10);
+                AddEmptyCall(httpConnection, 10);
                 var apiConnection = new ApiConnection(httpConnection);
                 var client = new TestClient(apiConnection);
 
@@ -480,55 +452,17 @@ namespace ComicVineApi.Tests.Clients
             [InlineData(10, 10)]
             [InlineData(15, 15)]
             [InlineData(20, 20)]
-            [InlineData(25, 20)]
-            [InlineData(100, 20)]
+            [InlineData(25, 24)]
+            [InlineData(100, 24)]
             public async Task FetchesTheCorrectAmountWithPartialPage(int desiredSize, int actualSize)
             {
                 // arrange
                 var actual = Enumerable.Range(1, actualSize).ToList();
                 var httpConnection = Substitute.For<IHttpConnection>();
-                // page 1 has 10 items
-                httpConnection
-                    .FilterAsync<TestModel>(
-                        Arg.Any<Uri>(),
-                        Arg.Is<Dictionary<string, object>>(o => o["offset"].Equals(0)))
-                    .Returns(Task.FromResult(new CollectionResult<TestModel>
-                    {
-                        Results = Enumerable.Range(1, 10)
-                            .Select(i => new TestModel { Id = i })
-                            .ToArray()
-                    }));
-                // page 2 has 10 items
-                httpConnection
-                    .FilterAsync<TestModel>(
-                        Arg.Any<Uri>(),
-                        Arg.Is<Dictionary<string, object>>(o => o["offset"].Equals(10)))
-                    .Returns(Task.FromResult(new CollectionResult<TestModel>
-                    {
-                        Results = Enumerable.Range(11, 10)
-                            .Select(i => new TestModel { Id = i })
-                            .ToArray()
-                    }));
-                // page 3 has 4 items
-                httpConnection
-                    .FilterAsync<TestModel>(
-                        Arg.Any<Uri>(),
-                        Arg.Is<Dictionary<string, object>>(o => o["offset"].Equals(20)))
-                    .Returns(Task.FromResult(new CollectionResult<TestModel>
-                    {
-                        Results = Enumerable.Range(11, 4)
-                            .Select(i => new TestModel { Id = i })
-                            .ToArray()
-                    }));
-                // the rest have 0 itemsc
-                httpConnection
-                    .FilterAsync<TestModel>(
-                        Arg.Any<Uri>(),
-                        Arg.Is<Dictionary<string, object>>(o => (int)o["offset"] > 20))
-                    .Returns(Task.FromResult(new CollectionResult<TestModel>
-                    {
-                        Results = Array.Empty<TestModel>()
-                    }));
+                AddCall(httpConnection, 0, 10);
+                AddCall(httpConnection, 10, 10);
+                AddCall(httpConnection, 20, 4);
+                AddEmptyCall(httpConnection, 20);
                 var apiConnection = new ApiConnection(httpConnection);
                 var client = new TestClient(apiConnection);
 
@@ -542,6 +476,33 @@ namespace ComicVineApi.Tests.Clients
 
                 // assert
                 Assert.Equal(actual, results);
+            }
+
+            private static void AddCall(IHttpConnection httpConnection, int offset, int count)
+            {
+                httpConnection
+                    .FilterAsync<TestModel>(
+                        Arg.Any<Uri>(),
+                        Arg.Is<Dictionary<string, object>>(o => o["offset"].Equals(offset)))
+                    .Returns(Task.FromResult(new CollectionResult<TestModel>
+                    {
+                        Results = Enumerable.Range(offset + 1, count)
+                            .Select(i => new TestModel { Id = i })
+                            .ToArray()
+                    }));
+            }
+
+            private static void AddEmptyCall(IHttpConnection httpConnection, int startOffset)
+            {
+                httpConnection
+                    .FilterAsync<TestModel>(
+                        Arg.Any<Uri>(),
+                        Arg.Is<Dictionary<string, object>>(o => (int)o["offset"] > startOffset))
+                    .Returns(Task.FromResult(new CollectionResult<TestModel>
+                    {
+                        Results = Array.Empty<TestModel>()
+
+                    }));
             }
         }
     }

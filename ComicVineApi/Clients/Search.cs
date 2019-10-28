@@ -107,6 +107,32 @@ namespace ComicVineApi.Clients
             return results.ToArray();
         }
 
+        public SearchOptions ToOptions() =>
+            new SearchOptions(options);
+
+        public async IAsyncEnumerable<ComicVineObject> ToAsyncEnumerable()
+        {
+            var opt = new SearchOptions(options);
+
+            // don't request more than we need
+            while (opt.Limit > 0)
+            {
+                var results = await client.SearchAsync(opt).ConfigureAwait(false);
+
+                // no more items in the source
+                if (results.Count == 0)
+                    yield break;
+
+                // just return the requested amount
+                var limited = results.Take(opt.Limit);
+                foreach (var res in limited)
+                    yield return res;
+
+                opt.Offset += results.Count;
+                opt.Limit -= results.Count;
+            }
+        }
+
         private static string GetPropertyName<TModel>(Expression<Func<TModel, object?>> property)
         {
             _ = property ?? throw new ArgumentNullException(nameof(property));

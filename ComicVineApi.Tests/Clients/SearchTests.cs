@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ComicVineApi.Clients;
 using ComicVineApi.Http;
@@ -306,6 +307,99 @@ namespace ComicVineApi.Tests.Clients
                 _ = httpConnection.Received().SearchAsync(
                     Arg.Any<Uri>(),
                     Arg.Is<Dictionary<string, object>>(o => o["resources"].Equals("character,issue")));
+            }
+        }
+
+        public class TheToAsyncEnumerableMethod
+        {
+            [Theory]
+            [InlineData(0, 0)]
+            [InlineData(5, 5)]
+            [InlineData(10, 10)]
+            [InlineData(15, 15)]
+            [InlineData(20, 20)]
+            [InlineData(25, 20)]
+            [InlineData(100, 20)]
+            public async Task FetchesTheCorrectAmount(int desiredSize, int actualSize)
+            {
+                // arrange
+                var actual = Enumerable.Range(1, actualSize).ToList();
+                var httpConnection = Substitute.For<IHttpConnection>();
+                AddCall(httpConnection, 0, 10);
+                AddCall(httpConnection, 10, 10);
+                AddEmptyCall(httpConnection, 10);
+                var apiConnection = new ApiConnection(httpConnection);
+                var client = new SearchClient(apiConnection);
+
+                // act
+                var enumerable = client.Search("anything")
+                    .Take(desiredSize)
+                    .ToAsyncEnumerable();
+                var results = new List<int>();
+                await foreach (var res in enumerable)
+                    results.Add(res.Id!.Value);
+
+                // assert
+                Assert.Equal(actual, results);
+            }
+
+            [Theory]
+            [InlineData(0, 0)]
+            [InlineData(5, 5)]
+            [InlineData(10, 10)]
+            [InlineData(15, 15)]
+            [InlineData(20, 20)]
+            [InlineData(25, 24)]
+            [InlineData(100, 24)]
+            public async Task FetchesTheCorrectAmountWithPartialPage(int desiredSize, int actualSize)
+            {
+                // arrange
+                var actual = Enumerable.Range(1, actualSize).ToList();
+                var httpConnection = Substitute.For<IHttpConnection>();
+                AddCall(httpConnection, 0, 10);
+                AddCall(httpConnection, 10, 10);
+                AddCall(httpConnection, 20, 4);
+                AddEmptyCall(httpConnection, 20);
+                var apiConnection = new ApiConnection(httpConnection);
+                var client = new SearchClient(apiConnection);
+
+                // act
+                var enumerable = client.Search("anything")
+                    .Take(desiredSize)
+                    .ToAsyncEnumerable();
+                var results = new List<int>();
+                await foreach (var res in enumerable)
+                    results.Add(res.Id!.Value);
+
+                // assert
+                Assert.Equal(actual, results);
+            }
+
+            private static void AddCall(IHttpConnection httpConnection, int offset, int count)
+            {
+                httpConnection
+                    .SearchAsync(
+                        Arg.Any<Uri>(),
+                        Arg.Is<Dictionary<string, object>>(o => o["offset"].Equals(offset)))
+                    .Returns(Task.FromResult(new SearchResult
+                    {
+                        Results = Enumerable.Range(offset + 1, count)
+                            .Select(i => new TestModel { Id = i })
+                            .ToArray()
+                    }));
+            }
+
+            private static void AddEmptyCall(IHttpConnection httpConnection, int startOffset)
+            {
+                httpConnection
+                    .SearchAsync(
+                        Arg.Any<Uri>(),
+                        Arg.Is<Dictionary<string, object>>(o => (int)o["offset"] > startOffset))
+                    .Returns(Task.FromResult(new SearchResult
+                    {
+                        Results = Array.Empty<TestModel>()
+
+                    }));
             }
         }
     }
