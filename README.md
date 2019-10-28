@@ -33,7 +33,70 @@ Console.WriteLine($"{cassie.Name} was born on {cassie.Birth}.");
 
 ### 2. Filter
 
-> TODO: add docs
+Basic filter with values:
+
+```csharp
+// create the client
+var client = new ComicVineClient("<API-KEY>", "<CUSTOM-USER-AGENT>");
+
+// request the female Cain family characters
+var females = client.Character.Filter()
+    .WithValue(x => x.Name, "Cain")
+    .WithValue(x => x.Gender, Gender.Female);
+
+// fetch the first result (all fields)
+var first = await females.FirstOrDefaultAsync();
+
+// print something out
+Console.WriteLine($"{first.Name} was born on {first.Birth}.");
+```
+
+Filter with reduced fields for smaller payloads:
+
+```csharp
+// create the client
+var client = new ComicVineClient("<API-KEY>", "<CUSTOM-USER-AGENT>");
+
+// request the female Cain family characters
+var females = client.Character.Filter()
+    .WithValue(x => x.Name, "Cain")
+    .WithValue(x => x.Gender, Gender.Female);
+
+// just fetch minimal data (id, name, birth)
+var smallPayload = females
+    .IncludeField(x => x.Id)
+    .IncludeField(x => x.Name)
+    .IncludeField(x => x.Birth);
+
+// fetch all the results on the page
+var page = await smallPayload.ToListAsync();
+
+// fetch all the items on all the pages
+foreach (var character in page)
+{
+    // print something out
+    Console.WriteLine($"{character.Name} was born on {character.Birth}.");
+}
+```
+
+Iterate over all the results on the server (via multiple API calls):
+
+```csharp
+// create the client
+var client = new ComicVineClient("<API-KEY>", "<CUSTOM-USER-AGENT>");
+
+// request the female Cain family characters
+var females = client.Character.Filter()
+    .WithValue(x => x.Name, "Cain")
+    .WithValue(x => x.Gender, Gender.Female);
+
+// fetch all the items on all the pages
+await foreach (var character in filter.ToAsyncEnumerable())
+{
+    // print something out
+    Console.WriteLine($"{character.Name} was born on {character.Birth}.");
+}
+```
 
 ### 3. Search
 
@@ -43,25 +106,25 @@ Console.WriteLine($"{cassie.Name} was born on {cassie.Birth}.");
 
 > TODO: add docs
 
- - [ ] Search
- - [ ] Resources
-    - [X] Characters
-    - [ ] Chats
-    - [ ] Concepts
-    - [ ] Episodes
-    - [ ] Issues
-    - [ ] Locations
-    - [ ] Movies
-    - [ ] Objects
-    - [ ] Origins
-    - [ ] People
-    - [ ] Powers
-    - [ ] Promos
-    - [X] Publishers
-    - [X] Series
-    - [ ] Story Arcs
-    - [ ] Teams
-    - [ ] Videos
-    - [ ] Video Types
-    - [ ] Video Categories
-    - [X] Volumes
+- [X] Search
+- [ ] Resources
+  - [X] Characters
+  - [ ] Chats
+  - [ ] Concepts
+  - [ ] Episodes
+  - [ ] Issues
+  - [ ] Locations
+  - [ ] Movies
+  - [ ] Objects
+  - [X] Origins
+  - [ ] People
+  - [ ] Powers
+  - [ ] Promos
+  - [X] Publishers
+  - [X] Series
+  - [ ] Story Arcs
+  - [ ] Teams
+  - [ ] Videos
+  - [ ] Video Types
+  - [ ] Video Categories
+  - [X] Volumes
